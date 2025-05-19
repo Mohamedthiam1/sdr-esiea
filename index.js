@@ -1,15 +1,20 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const app = express();
+
+require('dotenv').config();
 app.use(express.json());
 
-const serviceAccount = require('./key.json');
+// Charger les credentials Firebase depuis la variable d'environnement
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
 const db = admin.firestore();
 
+// Ajouter une ruche
 app.post('/api/ruches', async (req, res) => {
   try {
     const rucheData = req.body;
@@ -20,6 +25,7 @@ app.post('/api/ruches', async (req, res) => {
   }
 });
 
+// Obtenir toutes les ruches
 app.get('/api/ruches', async (req, res) => {
   try {
     const snapshot = await db.collection('ruches').get();
@@ -30,6 +36,7 @@ app.get('/api/ruches', async (req, res) => {
   }
 });
 
+// Obtenir une ruche par ID
 app.get('/api/ruches/:id', async (req, res) => {
   try {
     const rucheRef = db.collection('ruches').doc(req.params.id);
@@ -45,6 +52,7 @@ app.get('/api/ruches/:id', async (req, res) => {
   }
 });
 
+// Mettre à jour une ruche
 app.put('/api/ruches/:id', async (req, res) => {
   try {
     const rucheRef = db.collection('ruches').doc(req.params.id);
@@ -55,7 +63,8 @@ app.put('/api/ruches/:id', async (req, res) => {
   }
 });
 
+// Démarrer le serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
